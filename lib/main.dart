@@ -51,22 +51,7 @@ class _InputFieldState extends State<_InputField> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-
-  Future<void> _login() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Username dan Password tidak boleh kosong"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -89,7 +74,7 @@ class _InputFieldState extends State<_InputField> {
         const SizedBox(height: 10),
         ElevatedButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => MyWidget()));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
           },
           style: ElevatedButton.styleFrom(
             maximumSize: const Size(200, 50),
