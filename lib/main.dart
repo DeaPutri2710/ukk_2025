@@ -3,6 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ukk/beranda.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Supabase.initialize(
+    url: "https:fvykohkpduxbsolmohdx.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ2eWtvaGtwZHV4YnNvbG1vaGR4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk0MDk5NjgsImV4cCI6MjA1NDk4NTk2OH0.DfUPeEn_L7S8gQbf8g03XKBJi_hYNkAwZDSqtFTcZ4M",
+    );
   runApp(const MyApp());
 }
 

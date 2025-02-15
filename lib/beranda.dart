@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ukk/Produk/indexprodux.dart';
 import 'package:ukk/Registrasi/index.dart';
 import 'package:ukk/main.dart';
 
@@ -27,14 +28,14 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         drawer: _buildDrawer(context),
-        // body: TabBarView(
-        //   children: [
-        //     PelangganTab(),
-        //     ProdukTab(),
-        //     indexpenjualan(),
-        //     DetailPenjualan()
-        //   ],
-        // ),
+        body: TabBarView(
+          children: [
+            ProdukTab(),
+            Center(child: Text('coba'),),
+            Center(child: Text('coba'),),
+            Center(child: Text('coba'),)
+          ]
+        )
       ),
     );
   }
