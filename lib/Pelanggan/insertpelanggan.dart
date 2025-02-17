@@ -15,10 +15,10 @@ class _insertPageState extends State<insertPage> {
   final _notlp = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  Future<void> langgan() {
+  Future<void> langgan() async {
     if (_formKey.currentState!.validate()) {
       final String NamaPelanggan = _nmplg.text;
-      final String Alamat = _alamat.text;
+      final String Alamat = _alamat.text; 
       final String NomorTelepon = _notlp.text;
       try {
         final response =
@@ -54,7 +54,7 @@ class _insertPageState extends State<insertPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
+          key: _formKey, 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -81,6 +81,9 @@ class _insertPageState extends State<insertPage> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Nomor Telepon tidak boleh kosong.';
+                  }
+                  if (!RegExp(r'^\d+$').hasMatch(value)) {
+                    return 'Nomor Telepon harus berupa angka.';
                   }
                   return null;
                 },

@@ -110,7 +110,7 @@ class _ProdukTabState extends State<ProdukTab> {
                               children: [
                                 IconButton(
                                   icon: const Icon(Icons.edit,
-                                      color: Colors.blueAccent),
+                                      color: Colors.black),
                                   onPressed: () async {
                                     final Produkid = oduk['ProdukID'] ?? 0;
                                     if (Produkid != 0) {
@@ -131,7 +131,7 @@ class _ProdukTabState extends State<ProdukTab> {
                                 ),
                                 IconButton(
                                   icon: const Icon(Icons.delete,
-                                      color: Colors.redAccent),
+                                      color: Colors.black),
                                   onPressed: () {
                                     showDialog(
                                       context: context,

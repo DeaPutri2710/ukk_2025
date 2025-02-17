@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,7 +13,7 @@ class UpdateProduk extends StatefulWidget {
 
 class _UpdateProdukState extends State<UpdateProduk> {
   final _namaProdukController = TextEditingController();
-  final _hargaProdukController = TextEditingController();
+  final _hargaProdukController = TextEditingController(); 
   final _stokProdukController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = true;
@@ -120,7 +119,7 @@ class _UpdateProdukState extends State<UpdateProduk> {
                   },
                 ),
                 SizedBox(height: 16),
-                TextFormField(
+                TextFormField( 
                   controller: _stokProdukController,
                   decoration: InputDecoration(
                     labelText: 'Stok',

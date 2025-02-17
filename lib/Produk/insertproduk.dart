@@ -52,9 +52,15 @@ class _insertPageState extends State<insertPage> {
               TextFormField(
                 controller: _nmprdk,
                 decoration: const InputDecoration(
-                  labelText: 'Nama Pproduk',
+                  labelText: 'Nama Produk',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Nama Produk tidak boleh kosong.';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -85,7 +91,7 @@ class _insertPageState extends State<insertPage> {
                   if (value == null || value.isEmpty) {
                     return 'Stok tidak boleh kosong';
                   }
-                  return null;
+                  return null;  
                 },
               ),
               const SizedBox(height: 16),

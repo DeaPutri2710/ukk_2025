@@ -1,7 +1,8 @@
 import 'dart:js_interop_unsafe';
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:ukk/Produk/insertproduk.dart';
+import 'package:ukk/Pelanggan/updatepelanggan.dart';
+import 'package:ukk/Pelanggan/insertpelanggan.dart';
 import 'package:ukk/Registrasi/index.dart';
 
 class PelangganTab extends StatefulWidget {
@@ -13,20 +14,19 @@ class _PelangganTabState extends State<PelangganTab> {
  List<Map<String, dynamic>> pelanggan = [];
  bool isLoading = true;
 
- @override
-  void activate() {
-    // TODO: implement activate
-    void initState() {
-      fetchPelanggan();
-    }
+ @override  
+ void initState() {
+  super.initState();
+  fetchPelanggan();
+ }
 
-    Future<void> fetchPelanggan() async {
+  Future<void> fetchPelanggan() async {
       setState(() {
         isLoading = true;
       });
       try {
         final response =
-        await Supabase.instaance.client.from('pelanggan').select();
+        await Supabase.instance.client.from('pelanggan').select();
         setState(() {
           pelanggan = List<Map<String, dynamic>>.from(response);
           isLoading = false;
@@ -74,7 +74,7 @@ class _PelangganTabState extends State<PelangganTab> {
           padding: EdgeInsets.all(8),
           itemCount: pelanggan.length,
           itemBuilder: (context, index) {
-            final langgan = pelanggan['index'];
+            final langgan = pelanggan[index];
             return Card(
               elevation: 4,
               margin: EdgeInsets.symmetric(vertical: 8),
@@ -125,7 +125,7 @@ class _PelangganTabState extends State<PelangganTab> {
                                 if (PelangganID != 0) {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => UpdatePelanggan(PelangganID: PelangganID))
+                                    MaterialPageRoute(builder: (context) => Updatepelanggan(PelangganID: PelangganID))
                                   );
                                 } else {
                                   print('ID pelanggan tidak valid');
@@ -150,7 +150,7 @@ class _PelangganTabState extends State<PelangganTab> {
                                         ),
                                         TextButton(
                                           onPressed: () {
-                                            deletePelanggan(
+                                            deletePelangan(
                                               langgan['PelangganID']);
                                             Navigator.pop(context);
                                           },
@@ -182,5 +182,5 @@ class _PelangganTabState extends State<PelangganTab> {
 
           );
         }
-  }
+
 }
