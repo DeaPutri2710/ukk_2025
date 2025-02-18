@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ukk/Produk/updateproduk.dart';
 import 'package:ukk/Produk/insertproduk.dart';
-import 'package:ukk/Registrasi/index.dart';
 
 class ProdukTab extends StatefulWidget {
   @override
@@ -11,7 +10,9 @@ class ProdukTab extends StatefulWidget {
 
 class _ProdukTabState extends State<ProdukTab> {
   List<Map<String, dynamic>> produk = [];
+  List<Map<String, dynamic>> filteredProduk = [];
   bool isLoading = true;
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _ProdukTabState extends State<ProdukTab> {
       final response = await Supabase.instance.client.from('produk').select();
       setState(() {
         produk = List<Map<String, dynamic>>.from(response);
+        filteredProduk = produk;
         isLoading = false;
       });
     } catch (e) {
@@ -46,29 +48,45 @@ class _ProdukTabState extends State<ProdukTab> {
     }
   }
 
+  void filterProduk(String query) {
+    final hasilFilter = produk.where((prod) {
+      final namaProdukLower = prod['NamaProduk'].toLowerCase();
+      final searchLower = query.toLowerCase();
+      return namaProdukLower.contains(searchLower);
+    }).toList();
+
+    setState(() {
+      filteredProduk = hasilFilter;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: TextField(
+          controller: searchController,
+          decoration: InputDecoration(
+            hintText: 'Cari Produk...',
+            border: InputBorder.none,
+          ),
+          onChanged: filterProduk,
+        ),
+      ),
       body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : produk.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : filteredProduk.isEmpty
               ? Center(
                   child: Text(
                     'Tidak ada produk',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 )
-              : GridView.builder(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                  ),
+              : ListView.builder(
                   padding: EdgeInsets.all(8),
-                  itemCount: produk.length,
+                  itemCount: filteredProduk.length,
                   itemBuilder: (context, index) {
-                    final oduk = produk[index];
+                    final oduk = filteredProduk[index];
                     return Card(
                       elevation: 4,
                       margin: EdgeInsets.symmetric(vertical: 8),
@@ -109,8 +127,7 @@ class _ProdukTabState extends State<ProdukTab> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: const Icon(Icons.edit,
-                                      color: Colors.black),
+                                  icon: const Icon(Icons.edit, color: Colors.black),
                                   onPressed: () async {
                                     final Produkid = oduk['ProdukID'] ?? 0;
                                     if (Produkid != 0) {
@@ -130,8 +147,7 @@ class _ProdukTabState extends State<ProdukTab> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.black),
+                                  icon: const Icon(Icons.delete, color: Colors.black),
                                   onPressed: () {
                                     showDialog(
                                       context: context,
@@ -142,8 +158,7 @@ class _ProdukTabState extends State<ProdukTab> {
                                               'Apakah Anda yakin ingin menghapus produk ini?'),
                                           actions: [
                                             TextButton(
-                                              onPressed: () =>
-                                                  Navigator.pop(context),
+                                              onPressed: () => Navigator.pop(context),
                                               child: const Text('Batal'),
                                             ),
                                             TextButton(
@@ -161,7 +176,7 @@ class _ProdukTabState extends State<ProdukTab> {
                                 ),
                               ],
                             ),
-                          ],
+                          ], 
                         ),
                       ),
                     );

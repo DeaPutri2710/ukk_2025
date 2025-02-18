@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ukk/Detail/indexdetail.dart';
 import 'package:ukk/Pelanggan/indexpelanggan.dart';
+import 'package:ukk/Penjualan/indexjualan.dart';
 import 'package:ukk/Produk/indexprodux.dart';
 import 'package:ukk/Registrasi/index.dart';
 import 'package:ukk/main.dart';
@@ -33,9 +35,8 @@ class _HomePageState extends State<HomePage> {
           children: [
             ProdukTab(),
             PelangganTab(),
-            UserRegister(),
-            Center(child: Text(''),),
-            Center(child: Text(''),)
+            indexpenjualan(),
+            Indexdetail()
           ]
         )
       ),

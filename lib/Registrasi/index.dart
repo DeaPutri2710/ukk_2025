@@ -80,7 +80,7 @@ class _UserRegisterState extends State<UserRegister> {
                       children: const [
                         Expanded(flex: 2, child: Text('Username', style: TextStyle(fontWeight: FontWeight.bold))),
                         Expanded(flex: 2, child: Text('Password', style: TextStyle(fontWeight: FontWeight.bold))),
-                        Expanded(flex: 1, child: Text('Role', style: TextStyle(fontWeight: FontWeight.bold))),
+                        // Expanded(flex: 1, child: Text('Role', style: TextStyle(fontWeight: FontWeight.bold))),
                         Expanded(flex: 1, child: Text('Aksi', style: TextStyle(fontWeight: FontWeight.bold))),
                       ],
                     ),
@@ -101,7 +101,7 @@ class _UserRegisterState extends State<UserRegister> {
                           children: [
                             Expanded(flex: 2, child: Text(userdata['username'] ?? '')),
                             Expanded(flex: 2, child: Text(userdata['password'] ?? '')),
-                            Expanded(flex: 1, child: Text(userdata['role'] ?? '')),
+                            // Expanded(flex: 1, child: Text(userdata['role'] ?? '')),
                             Expanded(
                               flex: 1,
                               child: Row(
@@ -116,7 +116,7 @@ class _UserRegisterState extends State<UserRegister> {
                                           MaterialPageRoute(builder: (context) => UpdateUser(id: id)));
                                       }
                                     }, 
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
+                                  icon: const Icon(Icons.edit, color: Colors.black),
                                   ),
                                   IconButton(
                                     onPressed: () {
@@ -143,7 +143,7 @@ class _UserRegisterState extends State<UserRegister> {
                                           );
                                         });
                                     },
-                                    icon: const Icon(Icons.delete, color: Colors.red),
+                                    icon: const Icon(Icons.delete, color: Colors.black),
                                   ),
                                 ],
                               ),

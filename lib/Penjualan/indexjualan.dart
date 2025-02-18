@@ -1,15 +1,16 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk/Penjualan/insertpenjualan.dart';
+import 'package:ukk/Penjualan/checkout.dart';
 
-class Indexpenjualan extends StatefulWidget {
-  const Indexpenjualan({super.key});
+class indexpenjualan extends StatefulWidget {
+  const indexpenjualan({super.key});
 
   @override
-  State<Indexpenjualan> createState() => _IndexpenjualanState();
+  State<indexpenjualan> createState() => _indexpenjualanState();
 }
 
-class _IndexpenjualanState extends State<Indexpenjualan> {
+class _indexpenjualanState extends State<indexpenjualan> {
   List<Map<String, dynamic>> penjualan = [];
   bool isLoading = true;
 
@@ -25,9 +26,9 @@ class _IndexpenjualanState extends State<Indexpenjualan> {
     });
     try {
       final response = await Supabase.instance.client
-        .from('penjualan')
-        .select('*, pelanggan(*)')
-        .order('TanggalPenjualan', ascending: false);
+          .from('penjualan')
+          .select('*, pelanggan(*)')
+          .order('TanggalPenjualan', ascending: false);
       print(response);
       setState(() {
         penjualan = List<Map<String, dynamic>>.from(response);
@@ -44,52 +45,53 @@ class _IndexpenjualanState extends State<Indexpenjualan> {
   Future<void> deletePenjualan(int id) async {
     try {
       await Supabase.instance.client
-        .from('penjualan')
-        .delete()
-        .eq('PenjualanID', id);
+          .from('penjualan')
+          .delete()
+          .eq('PenjualanID', id);
       fetchPenjualan();
     } catch (e) {
-      print('Error deleteing penjualan: $e');
+      print('Error deleting penjualan: $e');
     }
   }
 
-  @override 
+  @override
   Widget build(BuildContext context) {
     print(penjualan);
+    // bool isLoading = true;
     return Scaffold(
       body: isLoading
-      ? const Center(child: CircularProgressIndicator())
-      : RefreshIndicator(
-        onRefresh: () async => fetchPenjualan(),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: penjualan.length,
-          itemBuilder: (context, index) {
-            final item = penjualan[index];
-            return Card(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ListTile(
-                title: Text(item['pelanggan']['NamaPelanggan']),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Total harga: ${item['TotalHarga']}'),
-                    Text('Tanggal Penjualan: ${item['TanggalPenjualan']}'),
-                  ],
-                ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.black),
-                  onPressed: () => _showDeleteDialog(context, item, index),
-                ),
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: () async => fetchPenjualan(),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: penjualan.length,
+                itemBuilder: (context, index) {
+                  final item = penjualan[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: ListTile(
+                      title: Text(item['pelanggan']['NamaPelanggan']),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Total harga: ${item['TotalHarga']}'),
+                          Text('Tanggal Penjualan: ${item['TanggalPenjualan']}'),
+                        ],
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.black),
+                        onPressed: () => _showDeleteDialog(context, item, index),
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      ),
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           var sales = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => Insertpenjualan()),
+            MaterialPageRoute(builder: (context) => COpage()),
           );
           if (sales == true) fetchPenjualan();
         },
@@ -116,7 +118,7 @@ class _IndexpenjualanState extends State<Indexpenjualan> {
                 Navigator.pop(context);
                 setState(() => penjualan.removeAt(index));
               },
-            child: const Text('Hapus', style: TextStyle(color: Colors.black)),
+              child: const Text('Hapus', style: TextStyle(color: Colors.black)),
             ),
           ],
         );

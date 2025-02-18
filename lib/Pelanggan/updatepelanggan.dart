@@ -33,7 +33,7 @@ class _UpdatepelangganState extends State<Updatepelanggan> {
           .single();
 
       setState(() {
-        _namaPelangganController.text = data['NamaPelaggan'] ?? '';
+        _namaPelangganController.text = data['NamaPelanggan'] ?? '';
         _teleponController.text = data['NomorTelepon'] ?? '';
         _alamatController.text = data['Alamat'] ?? '';
         _isLoading = false;

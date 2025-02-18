@@ -13,29 +13,38 @@ class UpdateUser extends StatefulWidget {
 class _UpdateUserState extends State<UpdateUser> {
   final _user = TextEditingController();
   final _password = TextEditingController();
-  final _role = TextEditingController();
+  // final _role = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchUserDetails();
+    _isLoadingDataUser();
   }
 
-  Future<void> fetchUserDetails() async {
+  Future<void> _isLoadingDataUser() async {
     try {
-      final response = await Supabase.instance.client
+      final data = await Supabase.instance.client
         .from('user')
         .select()
         .eq('id', widget.id)
         .single();
+
       setState(() {
-        _user.text = response['username'] ?? '';
-        _password.text = response['password'] ?? '';
-        _role.text = response['role'] ?? '';
+        _user.text = data ['username'] ?? '';
+        _password.text = data ['password'] ?? '';
+        // _role.text = data ['role'] ?? '';
+        _isLoading = false;
       });
     } catch (e) {
       print('Error: $e');
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal memuat data user.')),
+      );
     }
   }
   // Update user data di database
@@ -45,15 +54,21 @@ class _UpdateUserState extends State<UpdateUser> {
         await Supabase.instance.client.from('user').update({
           'username': _user.text,
           'password': _password.text,
-          'role': _role.text
+          // 'role': _role.text
         }).eq('id', widget.id);
 
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Data User berhasil diperbarui.')),
+        );
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => UserRegister()),
         );
       } catch (e) {
-        print('Error: $e');
+        print('Error updating user: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memperbarui data user.')),
+        );
       }
     }
   }
@@ -63,6 +78,10 @@ class _UpdateUserState extends State<UpdateUser> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Update User'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(8),
@@ -99,20 +118,20 @@ class _UpdateUserState extends State<UpdateUser> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: _role,
-                decoration: InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Role tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
+              // SizedBox(height: 16),
+              // TextFormField(
+              //   controller: _role,
+              //   decoration: InputDecoration(
+              //     labelText: 'Role',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Role tidak boleh kosong';
+              //     }
+              //     return null;
+              //   },
+              // ),
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: updateUserData,

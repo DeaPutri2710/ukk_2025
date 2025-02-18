@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ukk/Registrasi/index.dart';
@@ -13,42 +12,37 @@ class UserInsert extends StatefulWidget {
 class _UserInsertState extends State<UserInsert> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
+  // final TextEditingController _roleController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   Future<void> insertUser() async {
-  if (_formKey.currentState!.validate()) {
-    try {
-      final username = _usernameController.text.trim();
-      final password = _passwordController.text.trim();
-      final role = _roleController.text.trim();
+    if (_formKey.currentState!.validate()) {
+      try {
+        final String username = _usernameController.text;
+        final String password = _passwordController.text;
+        // final String role = _roleController.text;
 
-      final response = await Supabase.instance.client.from('user').insert({
-        'username': username,
-        'password': password,
-        'role': role,
-      });
+        await Supabase.instance.client.from('user').insert({
+          'username': username,
+          'password': password,
+          // 'role': role,
+        });
 
-      if (response == null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => UserRegister()),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User berhasil ditambahkan')),
         );
-      } else {
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => UserRegister()),
+          MaterialPageRoute(builder: (context) => const UserRegister()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal menambahkan user: $e')),
         );
       }
-    } catch (e) {
-      print("Error: $e");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserRegister()),
-      );
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -91,20 +85,20 @@ class _UserInsertState extends State<UserInsert> {
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _roleController,
-                decoration: const InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Role tidak boleh kosong';
-                  }
-                  return null;
-                },
-              ),
+              // const SizedBox(height: 16),
+              // TextFormField(
+              //   controller: _roleController,
+              //   decoration: const InputDecoration(
+              //     labelText: 'Role',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   validator: (value) {
+              //     if (value == null || value.isEmpty) {
+              //       return 'Role tidak boleh kosong';
+              //     }
+              //     return null;
+              //   },
+              // ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -120,4 +114,3 @@ class _UserInsertState extends State<UserInsert> {
     );
   }
 }
-  
