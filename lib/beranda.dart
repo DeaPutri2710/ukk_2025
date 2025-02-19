@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ukk/Detail/indexdetail.dart';
 import 'package:ukk/Pelanggan/indexpelanggan.dart';
 import 'package:ukk/Penjualan/indexjualan.dart';
 import 'package:ukk/Produk/indexprodux.dart';
@@ -25,7 +24,7 @@ class _HomePageState extends State<HomePage> {
             tabs: [
               Tab(icon: Icon(Icons.inventory, color: Colors.black), text: 'Produk'),
               Tab(icon: Icon(Icons.people, color: Colors.black), text: 'Pelanggan'),
-              Tab(icon: Icon(Icons.shopping_cart, color: Colors.black), text: 'Penjualan'),
+              // Tab(icon: Icon(Icons.shopping_cart, color: Colors.black), text: 'Penjualan'),
               Tab(icon: Icon(Icons.account_balance_wallet, color: Colors.black), text: 'Detail Penjualan'),
             ],
           ),
@@ -36,7 +35,7 @@ class _HomePageState extends State<HomePage> {
             ProdukTab(),
             PelangganTab(),
             indexpenjualan(),
-            Indexdetail()
+            //DetailPenjualan(),
           ]
         )
       ),

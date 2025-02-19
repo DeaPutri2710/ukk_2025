@@ -13,6 +13,10 @@ class indexpenjualan extends StatefulWidget {
 class _indexpenjualanState extends State<indexpenjualan> {
   List<Map<String, dynamic>> penjualan = [];
   bool isLoading = true;
+  
+  get oduk => null; 
+  
+  get totalHarga => null;
 
   @override
   void initState() {
@@ -91,7 +95,7 @@ class _indexpenjualanState extends State<indexpenjualan> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           var sales = await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => COpage()),
+           MaterialPageRoute(builder: (context) => COpage(cart: oduk, totalHarga: totalHarga)),
           );
           if (sales == true) fetchPenjualan();
         },

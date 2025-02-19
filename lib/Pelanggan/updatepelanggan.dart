@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:ukk/beranda.dart';
+import 'package:ukk/beranda.dart'; // Pastikan file beranda.dart berisi halaman HomePage atau halaman indexpenjualan yang tepat.
 
 class Updatepelanggan extends StatefulWidget {
   final int PelangganID;
@@ -52,6 +52,7 @@ class _UpdatepelangganState extends State<Updatepelanggan> {
   Future<void> _updatePelanggan() async {
     if (_formkey.currentState!.validate()) {
       try {
+        // Melakukan pembaruan data pelanggan di Supabase
         await Supabase.instance.client.from('pelanggan').update({
           'NamaPelanggan': _namaPelangganController.text,
           'NomorTelepon': _teleponController.text,
@@ -61,10 +62,12 @@ class _UpdatepelangganState extends State<Updatepelanggan> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Data pelanggan berhasil diperbarui.')),
         );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
+
+        await _isLoadingDataPelanggan();
+
+        // Kembali ke halaman sebelumnya (index pelanggan)
+        Navigator.pop(context, true); // Navigasi kembali ke halaman sebelumnya (indexpenjualan)
+        
       } catch (e) {
         print('Error updating pelanggan: $e');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +84,7 @@ class _UpdatepelangganState extends State<Updatepelanggan> {
         title: Text('Update Pelanggan'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context), // Kembali ke halaman sebelumnya
         ),
       ),
       body: _isLoading
@@ -148,4 +151,7 @@ class _UpdatepelangganState extends State<Updatepelanggan> {
             ),
     );
   }
+}
+
+class _isLoadingDataPelanggan {
 }

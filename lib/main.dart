@@ -35,7 +35,7 @@ class LoginPage extends StatelessWidget {
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
+            children: [
               _InputField(),
             ],
           ),

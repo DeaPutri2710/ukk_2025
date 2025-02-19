@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ukk/Penjualan/checkout.dart';
 import 'package:ukk/Produk/updateproduk.dart';
 import 'package:ukk/Produk/insertproduk.dart';
 
@@ -15,11 +16,12 @@ class _ProdukTabState extends State<ProdukTab> {
   TextEditingController searchController = TextEditingController();
 
   @override
-  void initState() {
+  void initState() { 
     super.initState();
     fetchProduk();
   }
 
+  // Fetch data produk dari Supabase
   Future<void> fetchProduk() async {
     setState(() {
       isLoading = true;
@@ -39,6 +41,7 @@ class _ProdukTabState extends State<ProdukTab> {
     }
   }
 
+  // Menghapus produk
   Future<void> deleteProduk(int id) async {
     try {
       await Supabase.instance.client.from('produk').delete().eq('ProdukID', id);
@@ -48,6 +51,7 @@ class _ProdukTabState extends State<ProdukTab> {
     }
   }
 
+  // Filter produk berdasarkan nama
   void filterProduk(String query) {
     final hasilFilter = produk.where((prod) {
       final namaProdukLower = prod['NamaProduk'].toLowerCase();
@@ -74,7 +78,7 @@ class _ProdukTabState extends State<ProdukTab> {
         ),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator()) // Menunggu loading
           : filteredProduk.isEmpty
               ? Center(
                   child: Text(
@@ -86,100 +90,119 @@ class _ProdukTabState extends State<ProdukTab> {
                   padding: EdgeInsets.all(8),
                   itemCount: filteredProduk.length,
                   itemBuilder: (context, index) {
-                    final oduk = filteredProduk[index];
-                    return Card(
-                      elevation: 4,
-                      margin: EdgeInsets.symmetric(vertical: 8),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      child: Padding(
-                        padding: EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              oduk['NamaProduk'] ?? 'Produk tidak tersedia',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
+                    final produkItem = filteredProduk[index]; // Ganti 'oduk' jadi 'produkItem'
+                    return GestureDetector(
+                        onTap: () {
+                          // Navigasi ke COpage
+                          num totalHarga = produkItem['Harga'] * produkItem['Stok'];
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return COpage(
+                                  cart: [produkItem],
+                                  totalHarga: totalHarga.toDouble(),
+                                );
+                              },
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Harga: Rp${oduk['Harga']}',
-                              style: TextStyle(
-                                fontStyle: FontStyle.italic,
-                                fontSize: 16,
-                                color: Colors.grey[700],
-                              ),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              '${oduk['Stok']} pcs',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const Divider(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                          );
+                        },
+                        child: Card(
+                          elevation: 4,
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Padding(
+                            padding: EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.black),
-                                  onPressed: () async {
-                                    final Produkid = oduk['ProdukID'] ?? 0;
-                                    if (Produkid != 0) {
-                                      var hasil = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              UpdateProduk(ProdukID: Produkid),
-                                        ),
-                                      );
-                                      if (hasil == true) {
-                                        fetchProduk();
-                                      }
-                                    } else {
-                                      print('ID produk tidak valid');
-                                    }
-                                  },
+                                Text(
+                                  produkItem['NamaProduk'] ?? 'Produk tidak tersedia',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.black),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Hapus Produk'),
-                                          content: const Text(
-                                              'Apakah Anda yakin ingin menghapus produk ini?'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              child: const Text('Batal'),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Harga: Rp${produkItem['Harga']}',
+                                  style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    fontSize: 16,
+                                    color: Colors.grey[700],
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  '${produkItem['Stok']} pcs',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const Divider(),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    // Tombol Edit
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.black),
+                                      onPressed: () async {
+                                        final Produkid = produkItem['ProdukID'] ?? 0;
+                                        if (Produkid != 0) {
+                                          var hasil = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  UpdateProduk(ProdukID: Produkid),
                                             ),
-                                            TextButton(
-                                              onPressed: () {
-                                                deleteProduk(oduk['ProdukID']);
-                                                Navigator.pop(context);
-                                              },
-                                              child: const Text('Hapus'),
-                                            ),
-                                          ],
+                                          );
+                                          if (hasil == true) {
+                                            fetchProduk();
+                                          }
+                                        } else {
+                                          print('ID produk tidak valid');
+                                        }
+                                      },
+                                    ),
+                                    // Tombol Hapus
+                                    IconButton(
+                                      icon: const Icon(Icons.delete, color: Colors.black),
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: const Text('Hapus Produk'),
+                                              content: const Text(
+                                                  'Apakah Anda yakin ingin menghapus produk ini?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  child: const Text('Batal'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    await deleteProduk(produkItem['ProdukID']);
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: const Text('Hapus'),
+                                                ),
+                                              ],
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ], 
-                        ),
-                      ),
-                    );
+                          ),
+                        ));
                   },
                 ),
       floatingActionButton: FloatingActionButton(
@@ -197,3 +220,4 @@ class _ProdukTabState extends State<ProdukTab> {
     );
   }
 }
+

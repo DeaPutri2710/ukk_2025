@@ -2,36 +2,64 @@ import 'package:dropdown_textfield/dropdown_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:ukk/detail/strukpenjualan.dart';
+
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: COpage(cart: [], totalHarga: 0),
+    );
+  }
+}
 
 class COpage extends StatefulWidget {
-  const COpage({super.key});
+  final List<Map<String, dynamic>> cart;
+  num totalHarga;
+
+  COpage({required this.cart, required this.totalHarga});
 
   @override
   State<COpage> createState() => _COpageState();
 }
 
 class _COpageState extends State<COpage> {
-  final SingleValueDropDownController nameController =
-      SingleValueDropDownController();
-  final SingleValueDropDownController produkController =
-      SingleValueDropDownController();
+  final SingleValueDropDownController nameController = SingleValueDropDownController();
+  final SingleValueDropDownController produkController = SingleValueDropDownController();
   final TextEditingController quantityController = TextEditingController();
   List<Map<String, dynamic>> myproduct = [];
   List<Map<String, dynamic>> user = [];
-  List<Map<String, dynamic>> cart = [];
-  
+
   takeProduct() async {
     var product = await Supabase.instance.client.from('produk').select();
-    setState(() {
-      myproduct = product;
-    });
+    if (product != null && product.isNotEmpty) {
+      setState(() {
+        myproduct = List<Map<String, dynamic>>.from(product);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Tidak ada produk tersedia'),
+      ));
+    }
   }
 
   takePelanggan() async {
     var pelanggan = await Supabase.instance.client.from('pelanggan').select();
-    setState(() {
-      user = pelanggan;
-    });
+    if (pelanggan != null && pelanggan.isNotEmpty) {
+      setState(() {
+        user = List<Map<String, dynamic>>.from(pelanggan);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Tidak ada data pelanggan'),
+      ));
+    }
   }
 
   @override
@@ -96,7 +124,7 @@ class _COpageState extends State<COpage> {
 
     if (selectedProduct != null && quantity > 0) {
       setState(() {
-        cart.add({
+        widget.cart.add({
           "ProdukID": selectedProduct["ProdukID"],
           "NamaProduk": selectedProduct["NamaProduk"],
           "Harga": selectedProduct["Harga"],
@@ -104,69 +132,28 @@ class _COpageState extends State<COpage> {
           "Jumlah": quantity,
           "Subtotal": (selectedProduct["Harga"] * quantity).toInt()
         });
+        widget.totalHarga += selectedProduct["Harga"] * quantity;
       });
     }
   }
-
-  void executeSales() async {
-  if (cart.isEmpty || nameController.dropDownValue == null) return;
-
-  var pelangganID = nameController.dropDownValue!.value["PelangganID"];
-  num totalHarga = cart.fold(0, (sum, item) => sum + item["Subtotal"]);
-
-  var response = await Supabase.instance.client
-      .from('penjualan')
-      .insert({
-        "PelangganID": pelangganID,
-        "TotalHarga": totalHarga,
-      })
-      .select()
-      .maybeSingle();
-
-  if (response != null) {
-    final penjualan = response;
-    for (var item in cart) {
-      await Supabase.instance.client.from('detailpenjualan').insert({
-        "PenjualanID": penjualan["PenjualanID"],
-        "ProdukID": item["ProdukID"],
-        "JumlahProduk": item["Jumlah"],
-        "Subtotal": item["Subtotal"],
-        "Stok": item["Stok"]
-      });
-
-      // Update stok produk
-      await Supabase.instance.client.from('produk').update({
-        'Stok': item["Stok"] - item["Jumlah"]
-      }).eq('ProdukID', item["ProdukID"]);
-    }
-
-    setState(() {
-      cart.clear();
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Penjualan Berhasil Ditambahkan')),
-    );
-    Navigator.pop(context, true);
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Gagal Menambahkan Penjualan')),
-    );
-  }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("Checkout Page")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             DropDownTextField(
-              dropDownList: user.map((u) => DropDownValueModel(name: u['NamaPelanggan'], value: u)).toList(),
+              dropDownList: user
+                  .map((u) => DropDownValueModel(name: u['NamaPelanggan'], value: u))
+                  .toList(),
               controller: nameController,
               textFieldDecoration: InputDecoration(labelText: "Select User"),
-              onChanged: (value) {setState(() {});},
+              onChanged: (value) {
+                setState(() {});
+              },
             ),
             if (nameController.dropDownValue != null) ...[
               SizedBox(height: 10),
@@ -178,19 +165,38 @@ class _COpageState extends State<COpage> {
             SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
-                itemCount: cart.length,
+                itemCount: widget.cart.length,
                 itemBuilder: (context, index) {
-                  final item = cart[index];
+                  final item = widget.cart[index];
                   return ListTile(
                     title: Text(item["NamaProduk"]),
-                    subtitle: Text("Jumlah: ${item["Jumlah"]}, Subtotal: ${item["Subtotal"]}"),
+                    subtitle: Text(
+                        "Jumlah: ${item["Jumlah"]}, Subtotal: ${item["Subtotal"]}"),
                   );
                 },
               ),
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: executeSales,
+              onPressed: () {
+                if (nameController.dropDownValue != null) {
+                  final user = nameController.dropDownValue?.value;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailPenjualanPage(
+                        cart: widget.cart,
+                        totalHarga: widget.totalHarga,
+                        user: user!,
+                      ),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Pilih pengguna terlebih dahulu")),
+                  );
+                }
+              },
               child: const Text('Checkout'),
             ),
           ],
@@ -199,3 +205,70 @@ class _COpageState extends State<COpage> {
     );
   }
 }
+
+// // class DetailPenjualanPage extends StatelessWidget {
+// //   final List<Map<String, dynamic>> cart;
+// //   final num totalHarga;
+// //   final Map<String, dynamic> user;
+
+// //   DetailPenjualanPage({
+// //     required this.cart,
+// //     required this.totalHarga,
+// //     required this.user,
+// //   });
+
+// //   @override
+// //   Widget build(BuildContext context) {
+// //     return Scaffold(
+// //       appBar: AppBar(title: Text("Struk Penjualan")),
+// //       body: Padding(
+// //         padding: const EdgeInsets.all(16.0),
+// //         child: Column(
+// //           crossAxisAlignment: CrossAxisAlignment.start,
+// //           children: [  
+
+// //             Text("Nama Pelanggan: ${user['NamaPelanggan']}", style: TextStyle(fontSize: 16)),
+// //             Text("Alamat: ${user['Alamat']}", style: TextStyle(fontSize: 16)),
+// //             SizedBox(height: 20),
+            
+// //             Expanded(
+// //               child: ListView.builder(
+// //                 itemCount: cart.length,
+// //                 itemBuilder: (context, index) {
+// //                   final item = cart[index];
+// //                   return Card(
+// //                     margin: EdgeInsets.only(bottom: 10),
+// //                     child: ListTile(
+// //                       title: Text(item["NamaProduk"]),
+// //                       subtitle: Text("Jumlah: ${item['Jumlah']}, Subtotal: ${item['Subtotal']}"),
+// //                     ),
+// //                   );
+// //                 },
+// //               ),
+// //             ),
+// //             SizedBox(height: 20),
+
+// //             Text("Total Harga: $totalHarga", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+
+// //             SizedBox(height: 20),
+// //             ElevatedButton(
+// //               onPressed: () {
+// //                 saveTransaction();
+// //                 Navigator.pop(context);
+// //               },
+// //               child: Text("Simpan Transaksi"),
+// //             ),
+// //           ],
+// //         ),
+// //       ),
+// //     );
+// //   }
+
+// //   void saveTransaction() {
+    
+// //     print("Transaksi Disimpan:");
+// //     print("User: ${user['NamaPelanggan']}");
+// //     print("Total Harga: $totalHarga");
+// //     print("Cart Items: $cart");
+// //   }
+// }
